@@ -1,0 +1,121 @@
+/* Module Editor Styles */
+.module-editor {
+    min-height: 100vh;
+    background: var(--bg-gradient);
+    padding: var(--space-6);
+}
+
+.editor-header {
+    background: white;
+    padding: var(--space-4) var(--space-6);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.editor-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.editor-form {
+    background: white;
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+}
+
+.form-row {
+    display: flex;
+    gap: var(--space-4);
+}
+
+.question-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.question-item {
+    background: white;
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.matching-pairs-editor {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    background: var(--gray-50);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+}
+
+.pair-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.pair-arrow {
+    font-size: var(--font-size-xl);
+    color: var(--gray-400);
+}
+
+.options-editor {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.correct-radio {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
