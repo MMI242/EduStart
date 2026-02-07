@@ -1,0 +1,150 @@
+/* Teacher Dashboard Styles */
+.teacher-dashboard {
+    min-height: 100vh;
+    background: var(--bg-gradient);
+}
+
+.teacher-header {
+    background: white;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.teacher-header .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) 0;
+}
+
+.teacher-nav {
+    display: flex;
+    gap: var(--space-4);
+}
+
+.dashboard-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6);
+}
+
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.stat-card {
+    background: white;
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    color: var(--gray-500);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.stat-value {
+    color: var(--gray-900);
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    margin-top: var(--space-2);
+}
+
+.modules-section {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-sm);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+}
+
+.section-header h2 {
+    font-size: var(--font-size-lg);
+    margin: 0;
+}
+
+.modules-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modules-table th,
+.modules-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.modules-table th {
+    font-weight: 600;
+    color: var(--gray-500);
+    font-size: var(--font-size-sm);
+}
+
+.module-row:hover {
+    background-color: var(--gray-50);
+}
+
+.badge {
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-reading {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-counting {
+    background: #fce7f3;
+    color: #9d174d;
+}
+
+.badge-cognitive {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-1);
+    border-radius: var(--radius-md);
+    transition: background 0.2s;
+}
+
+.btn-icon:hover {
+    background: var(--gray-200);
+}
+
+.btn-edit {
+    color: var(--primary-600);
+}
+
+.btn-delete {
+    color: var(--error-600);
+}

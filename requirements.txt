@@ -1,0 +1,54 @@
+# FastAPI and ASGI server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Pydantic for data validation
+pydantic==2.5.3
+pydantic-settings==2.1.0
+email-validator==2.1.0
+
+# Supabase client
+supabase
+postgrest
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+cryptography==41.0.7
+
+# HTTP client
+httpx==0.26.0
+requests==2.31.0
+
+# Redis for caching
+redis==5.0.1
+hiredis==2.3.2
+
+# Rate limiting
+slowapi==0.1.9
+
+# Database
+sqlalchemy==2.0.25
+alembic==1.13.1
+asyncpg==0.29.0
+
+# Machine Learning
+tensorflow==2.15.0
+scikit-learn==1.4.0
+numpy==1.26.3
+pandas==2.2.0
+
+# NLP (optional)
+transformers==4.36.0
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Monitoring and Logging
+sentry-sdk[fastapi]==1.39.2
+python-json-logger==2.0.7
+
+# Environment variables
+python-dotenv==1.0.0
