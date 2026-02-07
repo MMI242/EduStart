@@ -33,4 +33,4 @@ jobs:
 
       - name: Run pytest
         run: pytest -v
-        working-directory: ./tests
+        working-directory: ./
