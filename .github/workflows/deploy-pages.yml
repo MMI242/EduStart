@@ -30,7 +30,7 @@ jobs:
         working-directory: ui
 
       - name: Build UI (Vite)
-        run: npm run build
+        run: VITE_API_BASE_URL=https://api.edustart.online/api/v1 npm run build
         working-directory: ui
 
       - name: Upload Pages artifact
