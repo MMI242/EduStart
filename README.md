@@ -1,8 +1,9 @@
 # EduStart
 ![Logo](ui/public/logo.png)
 
-[![Node.js CI](https://github.com/MMI242/EduStart/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/MMI242/EduStart/actions/workflows/node.js.yml)
-[![Python CI (pytest)](https://github.com/MMI242/EduStart/actions/workflows/python.yml/badge.svg?branch=main)](https://github.com/MMI242/EduStart/actions/workflows/python.yml)
+[![npm test](https://github.com/MMI242/EduStart/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/MMI242/EduStart/actions/workflows/node.js.yml)
+[![pytest](https://github.com/MMI242/EduStart/actions/workflows/python.yml/badge.svg?branch=main)](https://github.com/MMI242/EduStart/actions/workflows/python.yml)
+[![Deploy UI to GitHub Pages](https://github.com/MMI242/EduStart/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/MMI242/EduStart/actions/workflows/deploy-pages.yml)
 
 Educational platform for interactive learning.
 
