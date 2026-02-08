@@ -1,13 +1,11 @@
 // API Client with authentication handling
 
-let API_BASE = '/api/v1';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 if (import.meta.env.DEV) {
-    console.log('Running in development mode');
-    API_BASE = 'http://localhost:8000/api/v1';
+    console.log('Running in development mode, API Base:', API_BASE);
 } else {
-    console.log('Running in production mode');
-    // Include production-only code here
+    console.log('Running in production mode, API Base:', API_BASE);
 }
 
 
