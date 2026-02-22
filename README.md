@@ -5,7 +5,29 @@
 [![pytest](https://github.com/MMI242/EduStart/actions/workflows/python.yml/badge.svg?branch=main)](https://github.com/MMI242/EduStart/actions/workflows/python.yml)
 [![Deploy UI to GitHub Pages](https://github.com/MMI242/EduStart/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/MMI242/EduStart/actions/workflows/deploy-pages.yml)
 
-Educational platform for interactive learning.
+EduStart is an adaptive learning platform for children aged 4–10. It offers gamified reading, counting, and cognitive modules with AI-powered recommendations and real-time progress tracking. Parents manage child profiles and monitor learning, while educators create and curate learning content through a dedicated dashboard.
+
+## Features
+
+### Learning
+- Interactive learning modules (reading, counting, cognitive)
+- Multiple question types: multiple choice, drag & drop, audio guess, coloring, matching
+- Adaptive difficulty powered by machine learning
+- AI-driven module recommendations based on learner progress
+- Offline module download support
+
+### Parent & Educator
+- Role-based access (parent and educator)
+- Child profile management with multi-child support
+- Progress reports and learning analytics
+- Educator dashboard for creating, editing, and managing modules
+
+### Platform
+- Supabase-backed authentication with JWT
+- REST API under `/api/v1` with automatic OpenAPI docs
+- React SPA with client-side routing
+- Docker Compose orchestration with nginx reverse proxy
+- CI/CD via GitHub Actions (build, test, deploy to GitHub Pages)
 
 ## Prerequisites
 
