@@ -1,19 +1,33 @@
-# Use Node.js as the base image
-FROM node:20-slim
+# ── Stage 1: Build ─────────────────────────────────────────────
+FROM node:20-slim AS build
 
-# Set the working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
-# Copy the rest of the application code
+# Copy source and build for production
 COPY . .
+RUN npm run build
 
-# Expose the port the app runs on
-EXPOSE 5173
+# ── Stage 2: Production (serve with nginx) ─────────────────────
+FROM nginx:alpine AS production
 
-# Start the application in development mode
-# Use --host to ensure it's accessible outside the container
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# Copy the built assets from the build stage
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Handle SPA client-side routing
+RUN echo 'server { \
+    listen 80; \
+    server_name localhost; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    location / { \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
