@@ -1,0 +1,135 @@
+# ──────────────────────────────────────────────────────────────────
+# CD Pipeline — runs when a release tag (v*.*.*) is pushed
+# Stages: Build & Push Image → Deploy to Staging → Smoke Test
+# ──────────────────────────────────────────────────────────────────
+name: CD Pipeline
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+env:
+  REGISTRY: ghcr.io
+  API_IMAGE_NAME: ${{ github.repository }}/api
+  UI_IMAGE_NAME: ${{ github.repository }}/ui
+
+jobs:
+  # ──────────── Stage 1: Build & Push Docker Images ────────
+  build-and-push:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract tag version
+        id: meta
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build & Push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & Push UI image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./ui
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.UI_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ env.UI_IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ──────────── Stage 2: Deploy to Staging ─────────────────
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract tag version
+        id: meta
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Deploy with Docker Compose
+        run: |
+          echo "🚀 Deploying version ${{ steps.meta.outputs.VERSION }} to staging..."
+          echo "API Image: ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}"
+          echo "UI  Image: ${{ env.REGISTRY }}/${{ env.UI_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}"
+          # In a real deployment this would SSH into the staging server and run:
+          #   docker compose pull && docker compose up -d
+          # For this project, we verify the images are available:
+          docker pull ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}
+          docker pull ${{ env.REGISTRY }}/${{ env.UI_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}
+          echo "✅ Images pulled successfully — staging deployment simulated"
+
+  # ──────────── Stage 3: Smoke Test ────────────────────────
+  smoke-test:
+    name: Post-Deployment Smoke Test
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract tag version
+        id: meta
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Run smoke test
+        run: |
+          echo "🧪 Running smoke test for ${{ steps.meta.outputs.VERSION }}..."
+          
+          # Start the API container for smoke testing
+          docker run -d --name api-smoke \
+            -p 8000:8000 \
+            -e ENVIRONMENT=test \
+            -e SUPABASE_URL=https://mock.supabase.co \
+            -e SUPABASE_KEY=mock-key \
+            -e SECRET_KEY=smoke-test-secret \
+            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}
+          
+          # Wait for the container to be ready
+          echo "Waiting for API to start..."
+          sleep 10
+          
+          # Health check
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/health || echo "000")
+          
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "✅ Health check passed (HTTP $HTTP_STATUS)"
+          else
+            echo "❌ Health check failed (HTTP $HTTP_STATUS)"
+            docker logs api-smoke
+            docker stop api-smoke && docker rm api-smoke
+            exit 1
+          fi
+          
+          # Cleanup
+          docker stop api-smoke && docker rm api-smoke
+          echo "✅ Smoke test completed successfully"
