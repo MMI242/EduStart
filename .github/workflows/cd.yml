@@ -72,9 +72,19 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     environment: staging
+    permissions:
+      contents: read
+      packages: read
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Compute image names (lowercase)
         id: images
@@ -103,9 +113,19 @@ jobs:
     name: Post-Deployment Smoke Test
     needs: deploy-staging
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Compute image names (lowercase)
         id: images
