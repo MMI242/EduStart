@@ -3,7 +3,6 @@ Analytics model definition for ML data collection
 """
 
 from datetime import datetime
-from typing import Optional
 from pydantic import BaseModel
 
 
@@ -19,7 +18,7 @@ class AnalyticsModel(BaseModel):
     duration_ms: int
     hesitation_ms: int  # Time until first interaction
     timestamp: datetime
-    
+
     class Config:
         from_attributes = True
 

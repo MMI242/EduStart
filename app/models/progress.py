@@ -18,7 +18,7 @@ class ProgressModel(BaseModel):
     attempt_count: int = 1
     points_earned: int
     created_at: datetime
-    
+
     class Config:
         from_attributes = True
 

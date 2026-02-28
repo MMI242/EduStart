@@ -119,7 +119,7 @@ async def create_module(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only educators can create modules"
         )
-        
+
     try:
         module = await module_service.create_module(module_data.dict())
         if not module:
@@ -152,7 +152,7 @@ async def update_module(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only educators can update modules"
         )
-        
+
     try:
         module = await module_service.update_module(module_id, module_data.dict(exclude_unset=True))
         if not module:
@@ -184,7 +184,7 @@ async def delete_module(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only educators can delete modules"
         )
-        
+
     try:
         success = await module_service.delete_module(module_id)
         if not success:

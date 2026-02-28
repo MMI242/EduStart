@@ -16,16 +16,16 @@ def validate_password_strength(password: str) -> tuple[bool, Optional[str]]:
     """
     if len(password) < 8:
         return False, "Password must be at least 8 characters long"
-    
+
     if not re.search(r'[A-Z]', password):
         return False, "Password must contain at least one uppercase letter"
-    
+
     if not re.search(r'[a-z]', password):
         return False, "Password must contain at least one lowercase letter"
-    
+
     if not re.search(r'[0-9]', password):
         return False, "Password must contain at least one number"
-    
+
     return True, None
 
 
@@ -43,14 +43,14 @@ def sanitize_string(text: str, max_length: int = 255) -> str:
     """Sanitize string input"""
     # Remove leading/trailing whitespace
     text = text.strip()
-    
+
     # Remove excessive whitespace
     text = re.sub(r'\s+', ' ', text)
-    
+
     # Truncate to max length
     if len(text) > max_length:
         text = text[:max_length]
-    
+
     return text
 
 
@@ -64,13 +64,13 @@ def validate_date_range(
     """
     if start_date > end_date:
         return False, "Start date must be before end date"
-    
+
     if end_date > datetime.utcnow():
         return False, "End date cannot be in the future"
-    
+
     # Check if range is too large (e.g., more than 1 year)
     days_diff = (end_date - start_date).days
     if days_diff > 365:
         return False, "Date range cannot exceed 1 year"
-    
+
     return True, None

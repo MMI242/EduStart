@@ -20,7 +20,7 @@ class UserModel(BaseModel):
     last_login: Optional[datetime] = None
     is_active: bool = True
     privacy_policy_accepted_at: Optional[datetime] = None
-    
+
     class Config:
         from_attributes = True
 

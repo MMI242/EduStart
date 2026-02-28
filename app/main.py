@@ -28,9 +28,9 @@ async def lifespan(app: FastAPI):
     logger.info("Starting EduStart Backend API...")
     logger.info(f"Environment: {settings.ENVIRONMENT}")
     logger.info(f"Debug Mode: {settings.DEBUG}")
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down EduStart Backend API...")
 
@@ -76,7 +76,7 @@ if UI_DIR.exists():
     assets_dir = UI_DIR / "assets"
     if assets_dir.exists():
         app.mount("/assets", StaticFiles(directory=assets_dir), name="static-assets")
-    
+
     # Serve other static files from ui/dist (favicon, etc.)
     @app.get("/vite.svg", include_in_schema=False)
     @app.get("/favicon.ico", include_in_schema=False)
@@ -85,7 +85,7 @@ if UI_DIR.exists():
         if favicon.exists():
             return FileResponse(favicon)
         return FileResponse(UI_DIR / "index.html")
-    
+
     # Catch-all route for SPA - serves index.html for client-side routing
     @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_spa(full_path: str):

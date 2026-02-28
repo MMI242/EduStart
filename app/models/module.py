@@ -24,7 +24,7 @@ class ModuleModel(BaseModel):
     created_at: datetime
     updated_at: datetime
     is_active: bool = True
-    
+
     class Config:
         from_attributes = True
 
@@ -78,7 +78,7 @@ class QuestionModel(BaseModel):
     sequence_order: int
     points: int = 10
     created_at: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -88,7 +88,8 @@ CREATE TABLE questions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     module_id UUID NOT NULL REFERENCES modules(id) ON DELETE CASCADE,
     question_text TEXT NOT NULL,
-    question_type VARCHAR(50) NOT NULL CHECK (question_type IN ('drag_drop', 'multiple_choice', 'audio_guess', 'coloring')),
+    question_type VARCHAR(50) NOT NULL
+        CHECK (question_type IN ('drag_drop', 'multiple_choice', 'audio_guess', 'coloring')),
     options JSONB,
     correct_answer TEXT NOT NULL,
     media_url VARCHAR(500),

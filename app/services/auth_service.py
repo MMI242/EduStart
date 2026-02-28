@@ -1,6 +1,5 @@
-from typing import Optional
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from app.core.supabase_client import get_supabase_client
 from app.schemas.user import UserRegister, UserLogin, UserResponse, TokenResponse
@@ -11,10 +10,10 @@ logger = logging.getLogger(__name__)
 
 class AuthService:
     """Service for authentication operations"""
-    
+
     def __init__(self):
         self.supabase = get_supabase_client()
-    
+
     async def register_user(self, user_data: UserRegister) -> UserResponse:
         """
         Register a new user
@@ -31,12 +30,12 @@ class AuthService:
                     }
                 }
             })
-            
+
             if not auth_response.user:
                 raise ValueError("Failed to create user")
-            
+
             user = auth_response.user
-            
+
             # Create user profile in database
             profile_data = {
                 "id": user.id,
@@ -45,11 +44,11 @@ class AuthService:
                 "full_name": user_data.full_name,
                 "created_at": datetime.utcnow().isoformat()
             }
-            
+
             self.supabase.table("users").insert(profile_data).execute()
-            
+
             logger.info(f"User registered successfully: {user.email}")
-            
+
             return UserResponse(
                 id=user.id,
                 email=user.email,
@@ -57,11 +56,11 @@ class AuthService:
                 created_at=datetime.utcnow(),
                 full_name=user_data.full_name
             )
-            
+
         except Exception as e:
             logger.error(f"Registration failed: {str(e)}")
             raise ValueError(f"Registration failed: {str(e)}")
-    
+
     async def login_user(self, credentials: UserLogin) -> TokenResponse:
         """
         Login user and return tokens
@@ -71,25 +70,25 @@ class AuthService:
                 "email": credentials.email,
                 "password": credentials.password
             })
-            
+
             if not auth_response.session:
                 raise ValueError("Invalid credentials")
-            
+
             session = auth_response.session
-            
+
             logger.info(f"User logged in: {credentials.email}")
-            
+
             return TokenResponse(
                 access_token=session.access_token,
                 refresh_token=session.refresh_token,
                 token_type="bearer",
                 expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
             )
-            
+
         except Exception as e:
             logger.error(f"Login failed: {str(e)}")
             raise ValueError("Invalid email or password")
-    
+
     async def logout_user(self, user_id: str) -> bool:
         """
         Logout user
@@ -101,30 +100,30 @@ class AuthService:
         except Exception as e:
             logger.error(f"Logout failed: {str(e)}")
             raise
-    
+
     async def refresh_access_token(self, refresh_token: str) -> TokenResponse:
         """
         Refresh access token
         """
         try:
             auth_response = self.supabase.auth.refresh_session(refresh_token)
-            
+
             if not auth_response.session:
                 raise ValueError("Invalid refresh token")
-            
+
             session = auth_response.session
-            
+
             return TokenResponse(
                 access_token=session.access_token,
                 refresh_token=session.refresh_token,
                 token_type="bearer",
                 expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
             )
-            
+
         except Exception as e:
             logger.error(f"Token refresh failed: {str(e)}")
             raise ValueError("Invalid or expired refresh token")
-    
+
     async def accept_privacy_policy(self, user_id: str) -> bool:
         """
         Record user acceptance of privacy policy
@@ -133,13 +132,13 @@ class AuthService:
             self.supabase.table("users").update({
                 "privacy_policy_accepted_at": datetime.utcnow().isoformat()
             }).eq("id", user_id).execute()
-            
+
             logger.info(f"User accepted privacy policy: {user_id}")
             return True
         except Exception as e:
             logger.error(f"Failed to record privacy policy acceptance: {str(e)}")
             raise
-    
+
     async def get_user_profile(self, user_id: str) -> dict:
         """
         Get user profile including privacy policy status

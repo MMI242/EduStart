@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from typing import List
 import logging
 
 from app.schemas.recommendation import RecommendationResponse

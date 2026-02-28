@@ -18,7 +18,7 @@ class ChildModel(BaseModel):
     total_points: int = 0
     created_at: datetime
     updated_at: datetime
-    
+
     class Config:
         from_attributes = True
 

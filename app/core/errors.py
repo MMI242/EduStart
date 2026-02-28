@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from pydantic import ValidationError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -49,11 +48,11 @@ def add_exception_handlers(app: FastAPI):
     """
     Add custom exception handlers to FastAPI app
     """
-    
+
     @app.exception_handler(EduStartException)
     async def edustart_exception_handler(request: Request, exc: EduStartException):
         logger.error(f"EduStart exception: {exc.code} - {exc.message}")
-        
+
         status_code_map = {
             "AUTH_ERROR": status.HTTP_401_UNAUTHORIZED,
             "AUTHZ_ERROR": status.HTTP_403_FORBIDDEN,
@@ -61,7 +60,7 @@ def add_exception_handlers(app: FastAPI):
             "VALIDATION_ERROR": status.HTTP_400_BAD_REQUEST,
             "DB_ERROR": status.HTTP_500_INTERNAL_SERVER_ERROR,
         }
-        
+
         return JSONResponse(
             status_code=status_code_map.get(exc.code, status.HTTP_500_INTERNAL_SERVER_ERROR),
             content={
@@ -71,11 +70,11 @@ def add_exception_handlers(app: FastAPI):
                 }
             }
         )
-    
+
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
         logger.error(f"Validation error: {exc.errors()}")
-        
+
         errors = []
         for error in exc.errors():
             errors.append({
@@ -83,7 +82,7 @@ def add_exception_handlers(app: FastAPI):
                 "message": error["msg"],
                 "type": error["type"]
             })
-        
+
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={
@@ -94,11 +93,11 @@ def add_exception_handlers(app: FastAPI):
                 }
             }
         )
-    
+
     @app.exception_handler(Exception)
     async def general_exception_handler(request: Request, exc: Exception):
         logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
-        
+
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
