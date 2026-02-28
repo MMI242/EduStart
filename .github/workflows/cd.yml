@@ -11,8 +11,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  API_IMAGE_NAME: ${{ github.repository }}/api
-  UI_IMAGE_NAME: ${{ github.repository }}/ui
 
 jobs:
   # ──────────── Stage 1: Build & Push Docker Images ────────
@@ -36,9 +34,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract tag version
-        id: meta
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      - name: Compute image names (lowercase)
+        id: images
+        run: |
+          REPO="${{ github.repository }}"
+          REPO_LC="${REPO,,}"
+          VERSION="${GITHUB_REF#refs/tags/}"
+          echo "API_IMAGE=${REPO_LC}/api" >> $GITHUB_OUTPUT
+          echo "UI_IMAGE=${REPO_LC}/ui" >> $GITHUB_OUTPUT
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Build & Push API image
         uses: docker/build-push-action@v5
@@ -46,8 +50,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}
-            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ steps.images.outputs.API_IMAGE }}:${{ steps.images.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ steps.images.outputs.API_IMAGE }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -57,8 +61,8 @@ jobs:
           context: ./ui
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.UI_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}
-            ${{ env.REGISTRY }}/${{ env.UI_IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ steps.images.outputs.UI_IMAGE }}:${{ steps.images.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ steps.images.outputs.UI_IMAGE }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -72,20 +76,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract tag version
-        id: meta
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      - name: Compute image names (lowercase)
+        id: images
+        run: |
+          REPO="${{ github.repository }}"
+          REPO_LC="${REPO,,}"
+          VERSION="${GITHUB_REF#refs/tags/}"
+          echo "API_IMAGE=${REPO_LC}/api" >> $GITHUB_OUTPUT
+          echo "UI_IMAGE=${REPO_LC}/ui" >> $GITHUB_OUTPUT
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Deploy with Docker Compose
         run: |
-          echo "🚀 Deploying version ${{ steps.meta.outputs.VERSION }} to staging..."
-          echo "API Image: ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}"
-          echo "UI  Image: ${{ env.REGISTRY }}/${{ env.UI_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}"
+          echo "🚀 Deploying version ${{ steps.images.outputs.VERSION }} to staging..."
+          echo "API Image: ${{ env.REGISTRY }}/${{ steps.images.outputs.API_IMAGE }}:${{ steps.images.outputs.VERSION }}"
+          echo "UI  Image: ${{ env.REGISTRY }}/${{ steps.images.outputs.UI_IMAGE }}:${{ steps.images.outputs.VERSION }}"
           # In a real deployment this would SSH into the staging server and run:
           #   docker compose pull && docker compose up -d
           # For this project, we verify the images are available:
-          docker pull ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}
-          docker pull ${{ env.REGISTRY }}/${{ env.UI_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}
+          docker pull ${{ env.REGISTRY }}/${{ steps.images.outputs.API_IMAGE }}:${{ steps.images.outputs.VERSION }}
+          docker pull ${{ env.REGISTRY }}/${{ steps.images.outputs.UI_IMAGE }}:${{ steps.images.outputs.VERSION }}
           echo "✅ Images pulled successfully — staging deployment simulated"
 
   # ──────────── Stage 3: Smoke Test ────────────────────────
@@ -97,13 +107,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract tag version
-        id: meta
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      - name: Compute image names (lowercase)
+        id: images
+        run: |
+          REPO="${{ github.repository }}"
+          REPO_LC="${REPO,,}"
+          VERSION="${GITHUB_REF#refs/tags/}"
+          echo "API_IMAGE=${REPO_LC}/api" >> $GITHUB_OUTPUT
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Run smoke test
         run: |
-          echo "🧪 Running smoke test for ${{ steps.meta.outputs.VERSION }}..."
+          echo "🧪 Running smoke test for ${{ steps.images.outputs.VERSION }}..."
           
           # Start the API container for smoke testing
           docker run -d --name api-smoke \
@@ -112,7 +127,7 @@ jobs:
             -e SUPABASE_URL=https://mock.supabase.co \
             -e SUPABASE_KEY=mock-key \
             -e SECRET_KEY=smoke-test-secret \
-            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.meta.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ steps.images.outputs.API_IMAGE }}:${{ steps.images.outputs.VERSION }}
           
           # Wait for the container to be ready
           echo "Waiting for API to start..."
