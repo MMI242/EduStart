@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { modulesApi } from '../../api/modules';
@@ -51,13 +51,7 @@ export function ModuleEditor() {
         }
     });
 
-    useEffect(() => {
-        if (isEditing && moduleId) {
-            loadModule();
-        }
-    }, [moduleId]);
-
-    const loadModule = async () => {
+    const loadModule = useCallback(async () => {
         if (!moduleId) return;
         setIsLoading(true);
         try {
@@ -84,9 +78,15 @@ export function ModuleEditor() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [moduleId, navigate]);
 
-    const handleModuleChange = (field: string, value: any) => {
+    useEffect(() => {
+        if (isEditing && moduleId) {
+            loadModule();
+        }
+    }, [isEditing, moduleId, loadModule]);
+
+    const handleModuleChange = (field: string, value: string | number | boolean) => {
         setModuleData(prev => ({
             ...prev,
             [field]: value
@@ -122,7 +122,7 @@ export function ModuleEditor() {
         });
     };
 
-    const handleQuestionChange = (index: number, field: keyof Question, value: any) => {
+    const handleQuestionChange = (index: number, field: keyof Question, value: string | number | string[]) => {
         setModuleData(prev => {
             const newQuestions = [...(prev.content?.questions || [])];
             newQuestions[index] = {
@@ -239,7 +239,8 @@ export function ModuleEditor() {
                 await modulesApi.update(moduleId, moduleData);
             } else {
                 // For create, we need to ensure id is not present if it was accidentally set
-                const { id, ...createData } = moduleData;
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { id: _id, ...createData } = moduleData;
                 await modulesApi.create(createData as ModuleCreate);
             }
             navigate('/teacher/dashboard');

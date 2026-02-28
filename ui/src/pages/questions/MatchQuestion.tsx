@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './MatchQuestion.css';
 
 interface MatchPair {
@@ -19,75 +19,46 @@ interface ItemState {
     pairId: string; // The ID of the pair this item belongs to (usually the left item's text or a unique ID)
 }
 
+function buildItems(pairs: MatchPair[]) {
+    const left: ItemState[] = pairs.map((pair, index) => ({
+        id: `left-${index}`,
+        text: pair.left,
+        type: 'left' as const,
+        state: 'idle' as const,
+        pairId: `pair-${index}`
+    }));
+
+    const right: ItemState[] = pairs.map((pair, index) => ({
+        id: `right-${index}`,
+        text: pair.right,
+        type: 'right' as const,
+        state: 'idle' as const,
+        pairId: `pair-${index}`
+    }));
+
+    // Shuffle right items
+    const shuffledRight = [...right].sort(() => Math.random() - 0.5);
+
+    return { left, right: shuffledRight };
+}
+
 export function MatchQuestion({ pairs, onComplete }: MatchQuestionProps) {
-    const [leftItems, setLeftItems] = useState<ItemState[]>([]);
-    const [rightItems, setRightItems] = useState<ItemState[]>([]);
+    const [leftItems, setLeftItems] = useState<ItemState[]>(() => buildItems(pairs).left);
+    const [rightItems, setRightItems] = useState<ItemState[]>(() => buildItems(pairs).right);
     const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
     const [selectedRight, setSelectedRight] = useState<string | null>(null);
     const [isWrong, setIsWrong] = useState(false);
 
-    // Initialize and shuffle items
-    useEffect(() => {
-        const left: ItemState[] = pairs.map((pair, index) => ({
-            id: `left-${index}`,
-            text: pair.left,
-            type: 'left',
-            state: 'idle',
-            pairId: `pair-${index}`
-        }));
-
-        const right: ItemState[] = pairs.map((pair, index) => ({
-            id: `right-${index}`,
-            text: pair.right,
-            type: 'right',
-            state: 'idle',
-            pairId: `pair-${index}`
-        }));
-
-        // Shuffle right items
-        const shuffledRight = [...right].sort(() => Math.random() - 0.5);
-
-        setLeftItems(left);
-        setRightItems(shuffledRight);
-    }, [pairs]);
-
-    const handleItemClick = (item: ItemState) => {
-        if (item.state === 'matched' || isWrong) return;
-
-        if (item.type === 'left') {
-            if (selectedLeft === item.id) {
-                // Deselect
-                setSelectedLeft(null);
-            } else {
-                setSelectedLeft(item.id);
-            }
-        } else {
-            if (selectedRight === item.id) {
-                // Deselect
-                setSelectedRight(null);
-            } else {
-                setSelectedRight(item.id);
-            }
-        }
-    };
-
-    // Check for match
-    useEffect(() => {
-        if (selectedLeft && selectedRight) {
-            checkMatch();
-        }
-    }, [selectedLeft, selectedRight]);
-
-    const checkMatch = () => {
-        const leftItem = leftItems.find(i => i.id === selectedLeft);
-        const rightItem = rightItems.find(i => i.id === selectedRight);
+    const checkMatch = useCallback((leftId: string, rightId: string) => {
+        const leftItem = leftItems.find(i => i.id === leftId);
+        const rightItem = rightItems.find(i => i.id === rightId);
 
         if (!leftItem || !rightItem) return;
 
         if (leftItem.pairId === rightItem.pairId) {
             // Match found!
-            setLeftItems(prev => prev.map(i => i.id === selectedLeft ? { ...i, state: 'matched' } : i));
-            setRightItems(prev => prev.map(i => i.id === selectedRight ? { ...i, state: 'matched' } : i));
+            setLeftItems(prev => prev.map(i => i.id === leftId ? { ...i, state: 'matched' } : i));
+            setRightItems(prev => prev.map(i => i.id === rightId ? { ...i, state: 'matched' } : i));
             setSelectedLeft(null);
             setSelectedRight(null);
         } else {
@@ -98,6 +69,36 @@ export function MatchQuestion({ pairs, onComplete }: MatchQuestionProps) {
                 setSelectedLeft(null);
                 setSelectedRight(null);
             }, 1000);
+        }
+    }, [leftItems, rightItems]);
+
+    const handleItemClick = (item: ItemState) => {
+        if (item.state === 'matched' || isWrong) return;
+
+        if (item.type === 'left') {
+            if (selectedLeft === item.id) {
+                setSelectedLeft(null);
+            } else {
+                // If right is already selected, check match immediately
+                if (selectedRight) {
+                    setSelectedLeft(item.id);
+                    checkMatch(item.id, selectedRight);
+                } else {
+                    setSelectedLeft(item.id);
+                }
+            }
+        } else {
+            if (selectedRight === item.id) {
+                setSelectedRight(null);
+            } else {
+                // If left is already selected, check match immediately
+                if (selectedLeft) {
+                    setSelectedRight(item.id);
+                    checkMatch(selectedLeft, item.id);
+                } else {
+                    setSelectedRight(item.id);
+                }
+            }
         }
     };
 

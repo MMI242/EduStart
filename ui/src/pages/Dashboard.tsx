@@ -1,5 +1,4 @@
-// Dashboard Page
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/Button';
 import { Card, CardBody } from '../components/Card';
@@ -30,12 +29,7 @@ export function Dashboard() {
         }
     }, [user]);
 
-    // Fetch children on mount
-    useEffect(() => {
-        fetchChildren();
-    }, []);
-
-    async function fetchChildren() {
+    const fetchChildren = useCallback(async () => {
         try {
             const data = await childrenApi.getAll();
             setChildren(data);
@@ -47,7 +41,12 @@ export function Dashboard() {
         } finally {
             setIsLoading(false);
         }
-    }
+    }, [selectedChild]);
+
+    // Fetch children on mount
+    useEffect(() => {
+        fetchChildren();
+    }, [fetchChildren]);
 
     // Fetch progress when child is selected
     useEffect(() => {

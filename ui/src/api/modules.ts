@@ -109,4 +109,4 @@ export interface ModuleCreate {
     };
 }
 
-export interface ModuleUpdate extends Partial<ModuleCreate> { }
+export type ModuleUpdate = Partial<ModuleCreate>;

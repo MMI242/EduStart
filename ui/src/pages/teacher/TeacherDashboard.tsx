@@ -28,13 +28,12 @@ export function TeacherDashboard() {
         }
     };
 
-    const handleDelete = async (_moduleId: string) => {
+    const handleDelete = async (moduleId: string) => {
         if (!confirm('Apakah anda yakin ingin menghapus modul ini?')) return;
 
         try {
-            // TODO: Implement delete API in frontend
-            // await modulesApi.delete(moduleId);
-            alert('Fitur hapus belum diimplementasikan di frontend API');
+            await modulesApi.delete(moduleId);
+            await loadModules();
         } catch (error) {
             console.error('Failed to delete module:', error);
         }
