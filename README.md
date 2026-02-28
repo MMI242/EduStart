@@ -2,6 +2,7 @@
 ![Logo](ui/public/logo.png)
 
 [![CI Pipeline](https://github.com/MMI242/EduStart/actions/workflows/ci.yml/badge.svg)](https://github.com/MMI242/EduStart/actions/workflows/ci.yml)
+[![CD Pipeline](https://github.com/MMI242/EduStart/actions/workflows/cd.yml/badge.svg)](https://github.com/MMI242/EduStart/actions/workflows/cd.yml)
 [![Deploy UI to GitHub Pages](https://github.com/MMI242/EduStart/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/MMI242/EduStart/actions/workflows/deploy-pages.yml)
 
 EduStart is an adaptive learning platform for children aged 4–10. It offers gamified reading, counting, and cognitive modules with AI-powered recommendations and real-time progress tracking. Parents manage child profiles and monitor learning, while educators create and curate learning content through a dedicated dashboard.
