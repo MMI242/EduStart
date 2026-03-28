@@ -39,7 +39,7 @@ class TestRegisterUser:
         # Arrange
         user_data = UserRegister(
             email="newuser@example.com",
-            password="password123",
+            password="Password123",
             role="parent",
             full_name="New User",
         )
@@ -70,7 +70,7 @@ class TestRegisterUser:
         """Error path: Supabase auth returns no user (e.g. duplicate email)."""
         user_data = UserRegister(
             email="existing@example.com",
-            password="password123",
+            password="Password123",
             role="parent",
             full_name="Existing User",
         )
@@ -89,7 +89,7 @@ class TestRegisterUser:
         """Error path: Supabase throws an exception."""
         user_data = UserRegister(
             email="error@example.com",
-            password="password123",
+            password="Password123",
             role="parent",
             full_name="Error User",
         )
@@ -108,7 +108,7 @@ class TestLoginUser:
     @pytest.mark.asyncio
     async def test_login_user_happy_path(self, auth_service, mock_supabase):
         """Happy path: successful login returns tokens."""
-        credentials = UserLogin(email="user@example.com", password="password123")
+        credentials = UserLogin(email="user@example.com", password="Password123")
 
         mock_session = MagicMock()
         mock_session.access_token = "access-token-abc"
@@ -143,7 +143,7 @@ class TestLoginUser:
     @pytest.mark.asyncio
     async def test_login_user_supabase_error(self, auth_service, mock_supabase):
         """Error path: Supabase raises exception."""
-        credentials = UserLogin(email="user@example.com", password="password123")
+        credentials = UserLogin(email="user@example.com", password="Password123")
 
         mock_supabase.auth.sign_in_with_password.side_effect = Exception("Service down")
 
