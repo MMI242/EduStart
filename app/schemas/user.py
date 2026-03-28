@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional
 from datetime import datetime
 
@@ -10,7 +10,6 @@ class UserRegister(BaseModel):
         ...,
         min_length=8,
         max_length=64,
-        pattern=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$",
         description="Password minimal 8 karakter, harus mengandung huruf besar, huruf kecil, dan angka"
     )
     role: str = Field(
@@ -25,6 +24,17 @@ class UserRegister(BaseModel):
         pattern=r"^[A-Za-z\s]+$",
         description="Nama lengkap pengguna"
     )
+
+    @field_validator('password')
+    @classmethod
+    def validate_password_complexity(cls, v: str) -> str:
+        if not any(char.isupper() for char in v):
+            raise ValueError('Password harus mengandung setidaknya satu huruf besar')
+        if not any(char.islower() for char in v):
+            raise ValueError('Password harus mengandung setidaknya satu huruf kecil')
+        if not any(char.isdigit() for char in v):
+            raise ValueError('Password harus mengandung setidaknya satu angka')
+        return v
 
 
 class UserLogin(BaseModel):
