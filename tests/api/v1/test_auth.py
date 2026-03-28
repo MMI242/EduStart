@@ -15,7 +15,7 @@ async def test_register_user(async_client: AsyncClient, mock_auth_service):
     # Prepare
     user_data = {
         "email": "newuser@example.com",
-        "password": "password123",
+        "password": "Password123",
         "role": "parent",
         "full_name": "New User"
     }
@@ -46,7 +46,7 @@ async def test_login_user(async_client: AsyncClient, mock_auth_service):
     # Prepare
     credentials = {
         "email": "user@example.com",
-        "password": "password123"
+        "password": "Password123"
     }
     
     mock_token_response = TokenResponse(
@@ -103,7 +103,7 @@ async def test_register_duplicate_user(async_client: AsyncClient, mock_auth_serv
     # Prepare
     user_data = {
         "email": "existing@example.com",
-        "password": "password123",
+        "password": "Password123",
         "role": "parent",
         "full_name": "Existing User"
     }
@@ -124,7 +124,7 @@ async def test_login_invalid_credentials(async_client: AsyncClient, mock_auth_se
     # Prepare
     credentials = {
         "email": "user@example.com",
-        "password": "wrongpassword"
+        "password": "WrongPassword123"
     }
     
     # Configure mock to raise ValueError
