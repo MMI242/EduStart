@@ -171,7 +171,7 @@ class TestAuthenticationFlow:
         """Integration test: registering with an existing email should fail."""
         register_payload = {
             "email": "existing@example.com",
-            "password": "password123",
+            "password": "Password123",
             "role": "parent",
             "full_name": "Duplicate User",
         }
